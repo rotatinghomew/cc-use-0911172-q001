@@ -13,13 +13,16 @@ class Allocation:
     score: tuple[int, int, str]
     reasons: tuple[str, ...]
 
+def requirements_for(application: Mapping[str, Any]) -> dict[str, Any]:
+    return {'accessible': bool(application.get('accessible')), 'female_only': application.get('gender') == 'female', 'station_ids': application.get('station_ids', [])}
+
 class BedAllocator:
     def __init__(self, calendar: InventoryCalendar | None = None):
         self.calendar = calendar or InventoryCalendar()
 
     def allocate(self, application: Mapping[str, Any], beds: Sequence[Mapping[str, Any]], reservations: Sequence[Mapping[str, Any]]) -> Allocation:
         period = NightRange(dt.date.fromisoformat(application['arrival']), dt.date.fromisoformat(application['departure']))
-        requirements = {'accessible': bool(application.get('accessible')), 'female_only': application.get('gender') == 'female', 'station_ids': application.get('station_ids', [])}
+        requirements = requirements_for(application)
         free = self.calendar.free_beds(beds, reservations, period, requirements)
         if not free:
             return Allocation(application['application_id'], None, None, 'waitlisted', (999,999,''), ('no_continuous_bed_available',))

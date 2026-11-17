@@ -1,0 +1,40 @@
+{
+  "context": {
+    "beds": [
+      {"bed_id": "bed-1", "station_id": "station-1", "status": "active", "room_gender": "female", "commute_minutes": 15},
+      {"bed_id": "bed-2", "station_id": "station-1", "status": "active", "room_gender": "any", "commute_minutes": 20},
+      {"bed_id": "bed-3", "station_id": "station-2", "status": "active", "room_gender": "any", "accessible": true, "commute_minutes": 35}
+    ],
+    "reservations": [
+      {"reservation_id": "res-held-1", "bed_id": "bed-1", "arrival": "2026-11-20", "departure": "2026-11-22", "status": "held"},
+      {"reservation_id": "res-confirmed-1", "bed_id": "bed-2", "arrival": "2026-11-21", "departure": "2026-11-23", "status": "confirmed"},
+      {"reservation_id": "res-confirmed-2", "bed_id": "bed-3", "arrival": "2026-11-20", "departure": "2026-11-22", "status": "confirmed"}
+    ],
+    "prior_stays": []
+  },
+  "horizon": {"start": "2026-11-19", "end": "2026-11-24"},
+  "applications": [
+    {
+      "application_id": "app-w1", "applicant_id": "person-1",
+      "arrival": "2026-11-20", "departure": "2026-11-22",
+      "graduation_year": 2026, "interview_invitation": "interview-001", "diploma_reference": "diploma-001",
+      "gender": "female", "priority": 2, "submitted_at": "2026-11-16T09:00:00+00:00"
+    },
+    {
+      "application_id": "app-w2", "applicant_id": "person-2",
+      "arrival": "2026-11-21", "departure": "2026-11-23",
+      "graduation_year": 2025, "interview_invitation": "interview-002", "diploma_reference": "diploma-002",
+      "gender": "male", "accessible": true, "priority": 1, "submitted_at": "2026-11-16T10:00:00+00:00"
+    },
+    {
+      "application_id": "app-bad", "applicant_id": "person-3",
+      "arrival": "2026-11-20", "departure": "2026-11-21",
+      "graduation_year": 2026, "interview_invitation": "", "diploma_reference": "diploma-003",
+      "gender": "female"
+    }
+  ],
+  "scenarios": [
+    {"name": "释放未确认预留res-held-1", "release_reservation_ids": ["res-held-1"]},
+    {"name": "station-2协调2张无障碍临时床位", "capacity_adjustments": {"station-2": 2}, "temporary_bed_template": {"accessible": true}}
+  ]
+}

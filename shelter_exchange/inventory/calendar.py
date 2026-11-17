@@ -32,7 +32,7 @@ class InventoryCalendar:
                 return True
         return False
 
-    def free_beds(self, beds: Sequence[Mapping[str, Any]], reservations: Sequence[Mapping[str, Any]], period: NightRange, requirements: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    def compatible_beds(self, beds: Sequence[Mapping[str, Any]], requirements: Mapping[str, Any]) -> list[Mapping[str, Any]]:
         result = []
         for bed in beds:
             if bed.get('status') != 'active':
@@ -43,8 +43,11 @@ class InventoryCalendar:
                 continue
             if requirements.get('station_ids') and bed.get('station_id') not in set(requirements['station_ids']):
                 continue
-            if not self.occupied(reservations, bed['bed_id'], period):
-                result.append(bed)
+            result.append(bed)
+        return result
+
+    def free_beds(self, beds: Sequence[Mapping[str, Any]], reservations: Sequence[Mapping[str, Any]], period: NightRange, requirements: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+        result = [bed for bed in self.compatible_beds(beds, requirements) if not self.occupied(reservations, bed['bed_id'], period)]
         return sorted(result, key=lambda item: (not item.get('accessible',False), item.get('station_priority',99), item['bed_id']))
 
     def utilization(self, beds: Sequence[Mapping[str, Any]], reservations: Sequence[Mapping[str, Any]], period: NightRange) -> dict[str, float]:

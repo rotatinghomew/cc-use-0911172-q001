@@ -43,3 +43,15 @@ class ShelterService:
         report['pending_notifications']=len(self.database.pending_messages())
         report['applications']=len(self.database.list_applications())
         return report
+
+    def pressure_report(self, applications, beds, reservations, start: dt.date, end: dt.date, prior_stays=(), scenarios=()):
+        # 只读的供需压力分析: 不写记录、不 enqueue 通知, 不改动任何已有分配决定
+        from ..allocation.pressure import PressureAnalyzer, Scenario
+        from ..inventory.calendar import NightRange
+        analyzer=PressureAnalyzer(); horizon=NightRange(start,end)
+        base=analyzer.analyze(applications,beds,reservations,horizon,prior_stays=prior_stays,today=self.today())
+        result={'base':base}
+        if scenarios:
+            reports=[analyzer.analyze(applications,beds,reservations,horizon,prior_stays=prior_stays,today=self.today(),scenario=Scenario(**scenario)) for scenario in scenarios]
+            result['scenarios']=reports; result['comparison']=analyzer.compare(base,reports)
+        return result
